@@ -3,7 +3,7 @@ name: Scheduled Python Program
 
 on:
   schedule:
-    - cron: "0 8 * * *"
+    - cron: "*/30 * * * *"
       timezone: "America/Chicago"
 
   # Allow manual runs for testing

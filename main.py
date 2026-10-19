@@ -3,8 +3,8 @@ from datetime import datetime
 import smtplib
 import os
 
-MY_LAT = os.environ["LATITUDE"]
-MY_LNG = os.environ["LONGITUDE"]
+MY_LAT = float(os.environ["LATITUDE"])
+MY_LNG = float(os.environ["LONGITUDE"])
 EMAIL = os.environ["SMTP_EMAIL"]
 PASSWORD = os.environ["SMTP_APP_PASSWORD"]
 
@@ -14,10 +14,10 @@ def is_overhead():
 
     data = response.json()
 
-    longitude = float(data['iss_position']['longitude'])
-    latitude = float(data['iss_position']['latitude'])
+    iss_longitude = float(data['iss_position']['longitude'])
+    iss_latitude = float(data['iss_position']['latitude'])
 
-    if MY_LAT - 5 <= longitude <= MY_LAT + 5 and MY_LNG - 5 <= latitude <= MY_LNG + 5:
+    if MY_LAT - 5 <= iss_latitude <= MY_LAT + 5 and MY_LNG - 5 <= iss_longitude <= MY_LNG + 5:
         return True
     return False
 
@@ -33,10 +33,14 @@ def is_night():
 
     data = response.json()
 
-    sunrise = int(data['sunrise'].split('T')[1].split(':')[0])
-    sunset = int(data['sunset'].split('T')[1].split(':')[0])
+    sunrise = datetime.fromisoformat(
+        data["sunrise"].replace("Z", "+00:00")
+    )
+    sunset = datetime.fromisoformat(
+        data["sunset"].replace("Z", "+00:00")
+    )
 
-    time_now = datetime.now().hour
+    time_now = datetime.now(sunrise.tzinfo)
 
     if sunset <= time_now <= sunrise:
         return True
